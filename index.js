@@ -18,15 +18,23 @@ async function run() {
         const database = client.db(`${process.env.DB_NAME}`);
         const productCollection = database.collection(`${process.env.DB_COLLECTION1}`);
         const categoryCollection = database.collection(`${process.env.DB_COLLECTION2}`);
-        const orderCollection = database.collection(`${process.env.DB_COLLECTION3}`);
-        const userCollection = database.collection(`${process.env.DB_COLLECTION4}`);
+        const registeredUserCollection = database.collection(`${process.env.DB_COLLECTION3}`);
+        // const userCollection = database.collection(`${process.env.DB_COLLECTION4}`);
 
         //GET API
-        //For fetching all the food items
+        //For fetching all the products
         app.get('/products', async (req, res) => {
             const cursor = productCollection.find({});            
             const products = await cursor.toArray();
             res.send(products);
+        });
+
+        //POST API
+        //For storing registered user data
+        app.post('/registeredUser', async (req, res) => {
+            const user = req.body;
+            const result = await registeredUserCollection.insertOne(user);            
+            res.json(result);            
         });
 
     } finally {
