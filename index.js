@@ -35,6 +35,22 @@ async function run() {
             res.send(registeredUsers);
         });
 
+        //For fetching a particular emailId
+        app.get('/email/:emailId', async (req, res) => {
+            const emailId = req.params.emailId;
+            const query = { email: emailId }
+            const cursor = registeredUserCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        //For fetching all the categories
+        app.get('/categories', async (req, res) => {
+            const cursor = categoryCollection.find({});
+            const categories = await cursor.toArray();
+            res.send(categories);
+        });
+
         //POST API
         //For storing registered user data
         app.post('/registeredUser', async (req, res) => {
@@ -77,6 +93,23 @@ async function run() {
             };
             const result = await registeredUserCollection.updateOne(filter, action);
             res.send(result.modifiedCount > 0);
+        });
+
+        //DELETE API
+        //Delete a single category
+        app.delete('/deleteCategory/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await categoryCollection.deleteOne(query);
+            res.json(result);
+        });
+
+        //Delete a single product
+        app.delete('/deleteProduct/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productCollection.deleteOne(query);
+            res.json(result);
         });
 
     } finally {
