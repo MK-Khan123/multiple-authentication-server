@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
 require('dotenv').config();
 const app = express();
@@ -24,17 +24,48 @@ async function run() {
         //GET API
         //For fetching all the products
         app.get('/products', async (req, res) => {
-            const cursor = productCollection.find({});            
+            const cursor = productCollection.find({});
             const products = await cursor.toArray();
             res.send(products);
+        });
+
+        //For fetching all the registered users
+        app.get('/registeredUsers', async (req, res) => {
+            const cursor = registeredUserCollection.find({});
+            const registeredUsers = await cursor.toArray();
+            res.send(registeredUsers);
         });
 
         //POST API
         //For storing registered user data
         app.post('/registeredUser', async (req, res) => {
-            const user = req.body;
-            const result = await registeredUserCollection.insertOne(user);            
-            res.json(result);            
+            const newUser = req.body;
+            const result = await registeredUserCollection.insertOne(newUser);
+            res.json(result);
+        });
+
+        app.post('/category', async (req, res) => {
+            const newCategory = req.body;
+            const result = await categoryCollection.insertOne(newCategory);
+            res.json(result);
+        });
+
+        app.post('/product', async (req, res) => {
+            const newProduct = req.body;
+            const result = await productCollection.insertOne(newProduct);
+            res.json(result);
+        });
+
+        //PATCH API
+        app.patch('/editRole/:id', async (req, res) => {
+            const id = req.params.id;
+            const updatedUserRole = req.body.role;
+            const filter = { _id: ObjectId(id) };
+            const action = {
+                $set: { role: updatedUserRole }
+            };
+            const result = await registeredUserCollection.updateOne(filter, action);
+            res.send(result.modifiedCount > 0);
         });
 
     } finally {
