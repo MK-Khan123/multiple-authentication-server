@@ -55,8 +55,16 @@ async function run() {
         //For storing registered user data
         app.post('/registeredUser', async (req, res) => {
             const newUser = req.body;
-            const result = await registeredUserCollection.insertOne(newUser);
-            res.json(result);
+            const newUserEmail = req.body.email;
+            const query = { email: newUserEmail }
+            const cursor = registeredUserCollection.find(query);
+            const result = await cursor.toArray();
+            if (result.length === 1) {
+                res.json("The email already registered");
+            } else {
+                const response = await registeredUserCollection.insertOne(newUser);
+                res.json(response);
+            }
         });
 
         // For adding category
