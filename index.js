@@ -19,7 +19,6 @@ async function run() {
         const productCollection = database.collection(`${process.env.DB_COLLECTION1}`);
         const categoryCollection = database.collection(`${process.env.DB_COLLECTION2}`);
         const registeredUserCollection = database.collection(`${process.env.DB_COLLECTION3}`);
-        // const userCollection = database.collection(`${process.env.DB_COLLECTION4}`);
 
         //GET API
         //For fetching all the products
@@ -44,19 +43,31 @@ async function run() {
             res.json(result);
         });
 
+        // For adding category
         app.post('/category', async (req, res) => {
             const newCategory = req.body;
             const result = await categoryCollection.insertOne(newCategory);
             res.json(result);
         });
 
+        //For adding product
         app.post('/product', async (req, res) => {
             const newProduct = req.body;
             const result = await productCollection.insertOne(newProduct);
             res.json(result);
         });
 
+        //For filtering registered users using email and phone number
+        app.post('/filter', async (req, res) => {
+            const { phone, email } = req.body;
+            const query = { phone: phone, email: email }
+            const filter = registeredUserCollection.find(query);
+            const filteredData = await filter.toArray();
+            res.send(filteredData);
+        });
+
         //PATCH API
+        // To edit the role of registered users (admin or user)
         app.patch('/editRole/:id', async (req, res) => {
             const id = req.params.id;
             const updatedUserRole = req.body.role;
